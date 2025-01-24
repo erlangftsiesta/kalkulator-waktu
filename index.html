@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .container {
+            margin: 20px;
+        }
+        .year-selector {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+        select {
+            padding: 5px;
+            font-size: 16px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="year-selector">
+            Pilih Tahun: 
+            <select id="yearSelect" onchange="updateTable()">
+                <!-- Akan diisi dengan JavaScript -->
+            </select>
+        </div>
+        <table id="timeTable">
+            <tr>
+                <th>Bulan</th>
+                <th>Jumlah Hari</th>
+                <th>Jumlah Minggu</th>
+                <th>Jam</th>
+                <th>Menit</th>
+                <th>Detik</th>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        const months = [
+            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        ];
+
+        function populateYearDropdown() {
+            const yearSelect = document.getElementById('yearSelect');
+            const currentYear = new Date().getFullYear();
+            const startYear = currentYear - 20;
+            const endYear = currentYear + 20;
+
+            for(let year = startYear; year <= endYear; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                if(year === currentYear) {
+                    option.selected = true;
+                }
+                yearSelect.appendChild(option);
+            }
+        }
+
+        function getDaysInMonth(month, year) {
+            return new Date(year, month + 1, 0).getDate();
+        }
+
+        function getWeeksInMonth(days) {
+            // Menghitung jumlah minggu dengan membagi jumlah hari dengan 7
+            return days / 7;
+        }
+
+        function createTimeTable(year) {
+            const table = document.getElementById('timeTable');
+            while(table.rows.length > 1) {
+                table.deleteRow(1);
+            }
+
+            months.forEach((month, index) => {
+                const days = getDaysInMonth(index, year);
+                const weeks = getWeeksInMonth(days);
+                const hours = days * 24;
+                const minutes = hours * 60;
+                const seconds = minutes * 60;
+
+                const row = table.insertRow(-1);
+                row.insertCell(0).textContent = month;
+                row.insertCell(1).textContent = days;
+                row.insertCell(2).textContent = weeks.toFixed(2); // Menampilkan 2 angka desimal
+                row.insertCell(3).textContent = hours.toLocaleString();
+                row.insertCell(4).textContent = minutes.toLocaleString();
+                row.insertCell(5).textContent = seconds.toLocaleString();
+            });
+        }
+
+        function updateTable() {
+            const selectedYear = parseInt(document.getElementById('yearSelect').value);
+            createTimeTable(selectedYear);
+        }
+
+        // Inisialisasi
+        populateYearDropdown();
+        updateTable();
+    </script>
+</body>
+</html>
