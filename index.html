@@ -1,119 +1,141 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Waktu</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
         .container {
-            margin: 20px;
-        }
-        .year-selector {
-            margin-bottom: 20px;
-            text-align: right;
-        }
-        select {
-            padding: 5px;
-            font-size: 16px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 60%;
+            text-align: center;
         }
         table {
-            border-collapse: collapse;
             width: 100%;
-            margin: 20px 0;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #007BFF;
+            color: white;
         }
         tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: #f2f2f2;
+        }
+        button {
+            background: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="year-selector">
-            Pilih Tahun: 
-            <select id="yearSelect" onchange="updateTable()">
-                <!-- Akan diisi dengan JavaScript -->
-            </select>
-        </div>
-        <table id="timeTable">
-            <tr>
-                <th>Bulan</th>
-                <th>Jumlah Hari</th>
-                <th>Jumlah Minggu</th>
-                <th>Jam</th>
-                <th>Menit</th>
-                <th>Detik</th>
-            </tr>
-        </table>
+        <h2>Kalkulator Waktu</h2>
+        <label for="yearSelect">Pilih Tahun:</label>
+        <select id="yearSelect"></select>
+        <br><br>
+        <label for="bulan">Pilih Bulan:</label>
+        <select id="bulan">
+            <option value="0">Januari</option>
+            <option value="1">Februari</option>
+            <option value="2">Maret</option>
+            <option value="3">April</option>
+            <option value="4">Mei</option>
+            <option value="5">Juni</option>
+            <option value="6">Juli</option>
+            <option value="7">Agustus</option>
+            <option value="8">September</option>
+            <option value="9">Oktober</option>
+            <option value="10">November</option>
+            <option value="11">Desember</option>
+        </select>          
+        <br><br>
+        <button onclick="addTable()">Tambah Tabel</button>
+        <div id="tablesContainer"></div>
     </div>
 
     <script>
-        const months = [
-            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-        ];
-
         function populateYearDropdown() {
             const yearSelect = document.getElementById('yearSelect');
             const currentYear = new Date().getFullYear();
-            const startYear = currentYear - 20;
-            const endYear = currentYear + 20;
-
-            for(let year = startYear; year <= endYear; year++) {
+            for (let year = currentYear - 10; year <= currentYear + 10; year++) {
                 const option = document.createElement('option');
                 option.value = year;
                 option.textContent = year;
-                if(year === currentYear) {
-                    option.selected = true;
-                }
+                if (year === currentYear) option.selected = true;
                 yearSelect.appendChild(option);
             }
         }
 
-        function getDaysInMonth(month, year) {
+        function getDaysInMonth(year, month) {
             return new Date(year, month + 1, 0).getDate();
         }
 
-        function getWeeksInMonth(days) {
-            // Menghitung jumlah minggu dengan membagi jumlah hari dengan 7
-            return days / 7;
+        function addTable() {
+            const year = parseInt(document.getElementById('yearSelect').value);
+            const monthIndex = parseInt(document.getElementById('bulan').value);
+            const monthNames = [
+                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+            ];
+            const month = monthNames[monthIndex];
+
+            const days = getDaysInMonth(year, monthIndex);
+            const weeks = (days / 7).toFixed(2);
+            const hours = days * 24;
+            const minutes = hours * 60;
+            const seconds = minutes * 60;
+
+            const tableHTML = `
+                <table>
+                    <tr>
+                        <th>Bulan</th>
+                        <th>Jumlah Hari</th>
+                        <th>Jumlah Minggu</th>
+                        <th>Jam</th>
+                        <th>Menit</th>
+                        <th>Detik</th>
+                    </tr>
+                    <tr>
+                        <td>${month} ${year}</td>
+                        <td>${days}</td>
+                        <td>${weeks}</td>
+                        <td>${hours.toLocaleString()}</td>
+                        <td>${minutes.toLocaleString()}</td>
+                        <td>${seconds.toLocaleString()}</td>
+                    </tr>
+                </table>`;
+
+            document.getElementById('tablesContainer').innerHTML += tableHTML;
         }
 
-        function createTimeTable(year) {
-            const table = document.getElementById('timeTable');
-            while(table.rows.length > 1) {
-                table.deleteRow(1);
-            }
-
-            months.forEach((month, index) => {
-                const days = getDaysInMonth(index, year);
-                const weeks = getWeeksInMonth(days);
-                const hours = days * 24;
-                const minutes = hours * 60;
-                const seconds = minutes * 60;
-
-                const row = table.insertRow(-1);
-                row.insertCell(0).textContent = month;
-                row.insertCell(1).textContent = days;
-                row.insertCell(2).textContent = weeks.toFixed(2); // Menampilkan 2 angka desimal
-                row.insertCell(3).textContent = hours.toLocaleString();
-                row.insertCell(4).textContent = minutes.toLocaleString();
-                row.insertCell(5).textContent = seconds.toLocaleString();
-            });
-        }
-
-        function updateTable() {
-            const selectedYear = parseInt(document.getElementById('yearSelect').value);
-            createTimeTable(selectedYear);
-        }
-
-        // Inisialisasi
         populateYearDropdown();
-        updateTable();
     </script>
 </body>
 </html>
